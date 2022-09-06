@@ -1,0 +1,48 @@
+version: "3"
+services: 
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client/src:/app/src:ro
+    environment:
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/src:/app/src:ro
+    environment:
+      - DB_CONNECTION=mongodb://database:27017
+      - DB_NAME=liveDoc
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - database
+    networks:
+      - app-network
+
+  database:
+    image: mongo
+    volumes:
+      - database-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+      
+networks:
+  app-network:
+    driver: bridge
+    
+volumes:
+  database-data:
+  node_modules:
+  web-root:
+    driver: local
